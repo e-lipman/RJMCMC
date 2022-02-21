@@ -11,7 +11,7 @@ sum_by_z <- function(k, z, vec=NULL){
 update_weights  <- function(z, k, 
                             delta){
   # alpha_i = delta + n_i
-  alpha <- rep(delta, k) + as.numeric(table(z))
+  alpha <- rep(delta, k) + sum_by_z(k,z)
   as.numeric(rdirichlet(1, alpha))
 }
 
@@ -41,7 +41,7 @@ update_sig2 <- function(y, k, z, mu, b, a){
   a_cond <- a + 0.5*sum_by_z(k,z)
   b_cond <- b + 0.5*sum_by_z(k, z, (y-mu[z])^2)
   
-  rgamma(k, a_cond, b_cond)  
+  1/rgamma(k, a_cond, b_cond)  
 }
 
 # move type c
