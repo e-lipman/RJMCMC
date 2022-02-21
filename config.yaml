@@ -1,0 +1,11 @@
+# mcmc params
+sweeps: 100000
+burnin: 100000
+
+# hyperparameters
+kappa_mult: 1 # multiple of 1/R^2 to use
+a: 2
+g: 0.2
+h_mult: 10 # multiple of 1/R^2 to use
+k_max: 30
+delta: 1
