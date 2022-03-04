@@ -7,6 +7,15 @@ sum_by_z <- function(k, z, vec=NULL){
   else { map_dbl(1:k, ~sum(vec[z==.x])) }
 }
 
+get_allocation_probs <- function(y,w,mu,sig2){
+  # conditional distribution of z for each y
+  ## likelihood times weight
+  probs <- map(1:length(w), 
+               ~( w[.x] * dnorm(y, mu[.x], sqrt(sig2[.x])))) %>% 
+    abind(along=0) %>% t()
+  probs/rowSums(probs)
+}
+
 # move type a
 update_weights  <- function(z, k, 
                             delta){
@@ -45,14 +54,9 @@ update_sig2 <- function(y, k, z, mu, b, a){
 }
 
 # move type c
-update_z <- function(y, w, mu, sig2){
-   probs <- map(1:length(w), 
-                ~( w[.x] * dnorm(y, mu[.x], sqrt(sig2[.x])))) %>% 
-     abind(along=0) %>% t()
-   probs <- probs/rowSums(probs)
-   
-   map_int(1:length(y), 
-           ~sample(1:length(w), 1, prob = probs[.x,]))
+update_z <- function(y, w, mu, sig2){ 
+  probs <- get_allocation_probs(y,w,mu,sig2)
+  map_int(1:length(y), ~sample(1:length(w), 1, prob = probs[.x,]))
 }
 
 # move type d
