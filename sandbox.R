@@ -47,12 +47,15 @@ out <- run_mcmc(dat$y, k_init, w_init, z_init, mu_init, sig2_init,
 
 ## posterior for k
 prop.table(table(out$k))
-plot(out$k)
+plot(out$k, type="l")
 
 # acceptance fpr split and combine
-accept_stats <- tibble(label = c("split","combine"),
+accept_stats <- tibble(label = c("split","combine",
+                                 "birth","death"),
                  res = list(out$accept_split, 
-                            out$accept_combine)) %>%
+                            out$accept_combine,
+                            out$accept_birth,
+                            out$accept_death)) %>%
   mutate(x=map(res, sum),
          n=map(res, length),
          p=map(res, mean)) %>%
@@ -61,8 +64,16 @@ accept_stats <- tibble(label = c("split","combine"),
 accept_stats
 
 ## posterior means
-post_means_fixed_k(out, k=4)
- 
+post_means_by_k <-
+  tibble(k=unique(out$k)) %>%
+  mutate(post_means = map(k, post_means_fixed_k, out=out)) %>%
+  unnest(post_means)
+
+post_means_by_k %>% filter(k==3)
+
+post_means_by_k %>%
+  filter(mu==max(mu) | mu==min(mu))
+
 ## cluster plot
 make_cluster_plot(out)
  
@@ -71,4 +82,4 @@ plot_posterior_densities(dat$y, out, k=3:5)
 
 ## How often are components empty?
 z_count <- apply(out$z, 1, function(x){length(unique(x))})
-table(out$k, z_count)
+table(out$k, out$k-z_count)
