@@ -16,6 +16,8 @@ run_mcmc <- function(y, k, w_init, z_init, mu_init, sig2_init,
   
   accept_split <- c()
   accept_combine <- c()
+  accept_birth <- c()
+  accept_death <- c()
   
   # current values
   k_curr <- k_init
@@ -73,6 +75,29 @@ run_mcmc <- function(y, k, w_init, z_init, mu_init, sig2_init,
     }
     
     # step f
+    choose_birth <- (sample(0:1, 1)==1) & k_curr!=configs$k_max
+    if (choose_birth){
+      birth_death <- birth_step(k_curr, z_curr, 
+                                w_curr, mu_curr, sig2_curr, 
+                                a=configs$a, b=b_curr,  
+                                xi=M, kappa=configs$kappa_mult/R2,
+                                delta=configs$delta)
+      accept_move_f <- birth_death$accept
+      accept_birth <- c(accept_birth, accept_move_f)
+    } else {
+      birth_death <- death_step(k_curr, z_curr, 
+                                w_curr, mu_curr, sig2_curr,
+                                delta=configs$delta)
+      accept_move_f <- birth_death$accept 
+      accept_death <- c(accept_death, accept_move_f)
+    }
+    if (accept_move_f){
+      k_curr <- birth_death$k
+      z_curr <- birth_death$z
+      w_curr <- birth_death$w
+      mu_curr <- birth_death$mu
+      sig2_curr <- birth_death$sig2
+    }
     
     # store outputs
     if (i>burn){
@@ -86,5 +111,6 @@ run_mcmc <- function(y, k, w_init, z_init, mu_init, sig2_init,
   }
   
   list(k=k, z=z, w=w, mu=mu, sig2=sig2,
-       accept_split=accept_split, accept_combine=accept_combine)
+       accept_split=accept_split, accept_combine=accept_combine,
+       accept_birth=accept_birth, accept_death=accept_death)
 }
