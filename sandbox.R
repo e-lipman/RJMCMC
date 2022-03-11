@@ -46,21 +46,29 @@ out <- run_mcmc(dat$y, k_init, w_init, z_init, mu_init, sig2_init,
 # interpret results
 
 ## posterior for k
-out$k
+prop.table(table(out$k))
+plot(out$k)
+
+# acceptance fpr split and combine
+accept_stats <- tibble(label = c("split","combine"),
+                 res = list(out$accept_split, 
+                            out$accept_combine)) %>%
+  mutate(x=map(res, sum),
+         n=map(res, length),
+         p=map(res, mean)) %>%
+  select(-res) %>%
+  unnest(c(x,n,p))
+accept_stats
 
 ## posterior means
-#post_means_fixed_k(out, k=3)
-
+post_means_fixed_k(out, k=4)
+ 
 ## cluster plot
 make_cluster_plot(out)
-
+ 
 ## Predictive densities (in progress)
-x_grid <- seq(min(dat$y),max(dat$y),length=100)
-truth <- normal_mix_dens(w, mu, sig2, x_grid)
-post_pred <- post_pred_density(out, x_grid)
+plot_posterior_densities(dat$y, out, k=3:5)
 
-plot(x_grid, truth, type="l")
-lines(x_grid, post_pred, lty=2)
-
-hist(dat$y, breaks=50, probability = T)
-lines(x_grid, post_pred, lty=2)
+## How often are components empty?
+z_count <- apply(out$z, 1, function(x){length(unique(x))})
+table(out$k, z_count)

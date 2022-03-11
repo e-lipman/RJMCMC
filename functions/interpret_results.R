@@ -28,8 +28,13 @@ normal_mix_dens <- function(w, mu, sig2, x_grid){
     abind(along=0) %>% colSums()
 }
 
-post_pred_density <- function(out, x_grid){
-  dens_per_iter <- map(1:length(out$w),
+post_pred_density <- function(out, x_grid, k=NA){
+  if (!is.na(k)){
+    k_idx <- which(out$k==k)
+  } else {
+    k_idx <- 1:length(out$k)
+  }
+  dens_per_iter <- map(k_idx,
                        ~normal_mix_dens(out$w[[.x]], 
                                         out$mu[[.x]], out$sig2[[.x]],
                                         x_grid))
@@ -37,12 +42,55 @@ post_pred_density <- function(out, x_grid){
     colMeans()
 }
 
+plot_posterior_densities <- function(y, out, k, combined=T,
+                                     x_range = "data"){
+  k <- intersect(k, out$k)
+  
+  stopifnot(x_range %in% c("data","mu"))
+  if (x_range=="data"){
+    x_grid <- seq(min(dat$y), max(dat$y), length=100)
+  } else {
+    range_mu <- range(unlist(out$mu))
+    x_grid <- seq(range_mu[1],range_mu[2],length=100)
+  }
+  
+  dens_by_k <- tibble(k=k) %>%
+    mutate(dens=map(k,
+                    ~tibble(x=x_grid,
+                            y=post_pred_density(out, x_grid, k=.x)))) %>%
+    unnest(dens) %>%
+    mutate(k=as.character(k))
+  if (combined){
+    dens_combined <- tibble(k="all",
+           x=x_grid,
+           y=post_pred_density(out, x_grid))
+  }
+  
+  out <- dens_by_k %>%
+    ggplot(aes(x=x, y=y, color=k)) +
+    geom_histogram(data=tibble(y=y),
+                   aes(x=y, y = ..density..), 
+                   alpha=.4,
+                   inherit.aes=F) +
+    geom_line(linetype=ifelse(combined, "dashed","solid")) +
+    xlab("y") + ylab("") +
+    theme_bw()
+  
+  if (combined){
+    out <- out + 
+      geom_line(data = dens_combined, 
+                color="black", linetype="solid")
+  }
+  return(out)
+}
+
 
 # posterior for fixed k
 post_means_fixed_k <- function(out, k=3){
-  w <- abind(out$w, along=0) %>% colMeans()
-  mu <- abind(out$mu, along=0) %>% colMeans()
-  sig2 <- abind(out$sig2, along=0) %>% colMeans()
+  k_idx <- which(out$k==k)
+  w <- abind(out$w[k_idx], along=0) %>% colMeans()
+  mu <- abind(out$mu[k_idx], along=0) %>% colMeans()
+  sig2 <- abind(out$sig2[k_idx], along=0) %>% colMeans()
   
   tibble(j = 1:k,
          w=w, mu=mu, sig2=sig2)
