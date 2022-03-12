@@ -49,7 +49,8 @@ run_mcmc <- function(y, k, w_init, z_init, mu_init, sig2_init,
     
     # step e
     ## choose whether to do split or combine step
-    choose_split <- (sample(0:1, 1)==1) & k_curr!=configs$k_max
+    choose_split <- ((sample(0:1, 1)==1) & 
+                       k_curr!=configs$k_max) | k_curr==1
     if (choose_split){
       split_comb <- split_step(y, k_curr, z_curr, 
                           w_curr, mu_curr, sig2_curr, 
@@ -60,10 +61,10 @@ run_mcmc <- function(y, k, w_init, z_init, mu_init, sig2_init,
       accept_split <- c(accept_split, accept_move_e)
     } else {
       split_comb <- combine_step(y, k_curr, z_curr, 
-                          w_curr, mu_curr, sig2_curr, 
-                          a=configs$a, b=b_curr, 
-                          xi=M, kappa=configs$kappa_mult/R2,
-                          delta=configs$delta)
+                           w_curr, mu_curr, sig2_curr, 
+                           a=configs$a, b=b_curr, 
+                           xi=M, kappa=configs$kappa_mult/R2,
+                           delta=configs$delta)
       accept_move_e <- split_comb$accept
       accept_combine <- c(accept_combine,accept_move_e)
     }
