@@ -48,7 +48,7 @@ plot_posterior_densities <- function(y, out, k, combined=T,
   
   stopifnot(x_range %in% c("data","mu"))
   if (x_range=="data"){
-    x_grid <- seq(min(dat$y), max(dat$y), length=100)
+    x_grid <- seq(min(y), max(y), length=100)
   } else {
     range_mu <- range(unlist(out$mu))
     x_grid <- seq(range_mu[1],range_mu[2],length=100)
