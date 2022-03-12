@@ -4,8 +4,9 @@ run_mcmc <- function(y, k, w_init, z_init, mu_init, sig2_init,
                      sweeps = 1000, burn = 1000){
   
   # constants from data for priors
-  M <- (max(dat$y) + min(dat$y))/2    # midpoint
-  R2 <- (max(dat$y) - min(dat$y))^2   # range
+  M <- (max(y) + min(y))/2    # midpoint
+  R2 <- (max(y) - min(y))^2   # range
+  b_init <- rgamma(1, configs$g, configs$h_mult/R2)
   
   # outputs
   k <- rep(NA, sweeps)
