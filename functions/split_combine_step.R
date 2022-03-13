@@ -90,11 +90,11 @@ combine_step <- function(y, k, z, w, mu, sig2,
   laccept_prob <- laccept_prob_split(
     yj,  k_sm=k-1, 
     w_sm=w_new, mu_sm=mu_new, sig2_sm=sig2_new, 
-    z_lg=z_lg+1, 
+    z_lg=z_lg+1, # [1,2]-valued 
     w_lg=w[j1:j2], mu_lg=mu[j1:j2], sig2_lg=sig2[j1:j2], 
     u=c(u1,u2,u3), lp_alloc=lp_alloc, 
     a=a, b=b, xi=xi, kappa=kappa, delta=delta)
-  accept = (log(runif(1))<(-laccept_prob))
+  accept = (log(runif(1))<(-laccept_prob)) # inverse of split prob
   out <- list(accept=accept)
   
   # if accepted, create new values if needed
@@ -146,7 +146,7 @@ split_step <- function(y, k, z, w, mu, sig2,
   laccept_prob <- laccept_prob_split(
     y[z==j],  k_sm=k, 
     w_sm=w[j], mu_sm=mu[j], sig2_sm=sig2[j], 
-    z_lg=alloc+1, 
+    z_lg=alloc+1, # [1,2]-values
     w_lg=c(w1,w2), mu_lg=c(mu1,mu2), sig2_lg=c(sig21, sig22), 
     u=u, lp_alloc=lp_alloc, 
     a=a, b=b, xi=xi, kappa=kappa, delta=delta)
