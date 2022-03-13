@@ -1,18 +1,17 @@
 # move type f
 
-laccept_prob_birth <- function(w_new, k, k0, n, delta){
-  # k is k for smaller configuration (pre-birth or post-death)
+laccept_prob_birth <- function(w_new, k_sm, k0, n, delta){
   
   prob_params <-
-    -lbeta(k*delta, delta) +
+    (-lbeta(k_sm*delta, delta)) +
     (delta-1)*log(w_new) +
-    (n+k*(delta-1))*log(1-w_new) +
-    log(k+1)
+    (n+k_sm*(delta-1))*log(1-w_new) +
+    log(k_sm+1)
   
   hastings_ratio <- 
     -log(k0+1) -
-    dbeta(w_new,1,k, log=T) +
-    k*log(w_new)
+    dbeta(w_new,1,k_sm, log=T) +
+    k_sm*log(w_new)
   
   prob_params + hastings_ratio
 }
@@ -25,7 +24,7 @@ death_step <- function(k, z, w, mu, sig2, delta){
   
   j <- as.numeric(sample(as.character(is_empty), 1))
   laccept_prob <- 
-    laccept_prob_birth(w[j], k, 
+    laccept_prob_birth(w[j], k-1, 
                        k0=length(is_empty), n=length(z), delta=delta)
   accept = (log(runif(1))<(-laccept_prob))
   
@@ -44,7 +43,7 @@ death_step <- function(k, z, w, mu, sig2, delta){
 birth_step <- function(k, z, w, mu, sig2,
                        a, b, xi, kappa, delta){
   # generate new parameters
-  w_new <- rbeta(1, 1, k) 
+  w_new <- rbeta(1, 1, k)
   mu_new <- rnorm(1, xi, 1/sqrt(kappa))
   sig2_new <- 1/rgamma(1,a,b)
   
