@@ -10,10 +10,22 @@ sum_by_z <- function(k, z, vec=NULL){
 get_allocation_probs <- function(y,w,mu,sig2){
   # conditional distribution of z for each y
   ## likelihood times weight
-  probs <- map(1:length(w), 
-               ~( w[.x] * dnorm(y, mu[.x], sqrt(sig2[.x])))) %>% 
+  lprobs <- map(1:length(w), 
+               ~( w[.x] * dnorm(y, mu[.x], sqrt(sig2[.x]),
+                                log=T))) %>% 
     abind(along=0) %>% t()
-  probs/rowSums(probs)
+  
+  out <- exp(lprobs - log(rowSums(exp(lprobs))))
+  
+  # correct remaining numerical issues
+  bad_idx <- which(is.infinite(rowSums(out)))
+  if (length(bad_idx)>0){
+    col1_corrected <- 
+      as.numeric(lprobs[bad_idx,1]>lprobs[bad_idx,2])
+    out[bad_idx, ] <- cbind(col1_corrected,
+                            1-col1_corrected)
+  }
+  return(out)
 }
 
 # move type a
