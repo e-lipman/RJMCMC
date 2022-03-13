@@ -96,5 +96,29 @@ post_means_fixed_k <- function(out, k=3){
          w=w, mu=mu, sig2=sig2)
 }
 
+# get acceptance stats
+get_accept_stats <- function(out, agg = F){
+  accept_stats <- tibble(label = c("split","combine",
+                                   "birth","death"),
+                         res = list(out$accept_split, 
+                                    out$accept_combine,
+                                    out$accept_birth,
+                                    out$accept_death)) %>%
+    mutate(x=map(res, sum),
+           n=map(res, length),
+           p=map(res, mean)) %>%
+    select(-res) %>%
+    unnest(c(x,n,p))
+  
+  if (agg){
+    accept_stats %>%
+      mutate(group=rep(c("e","f"), each=2)) %>%
+      group_by(group) %>%
+      summarise(x=sum(x), n=sum(n), p=x/n)
+  } else {
+    accept_stats
+  }
+}
+
 
 
