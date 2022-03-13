@@ -78,7 +78,6 @@ combine_step <- function(y, k, z, w, mu, sig2,
   u1 <- w[j1]/w_new
   u2 <- sqrt(w[j1]/w[j2])*(mu_new-mu[j1])/sqrt(sig2_new)
   u3 <- (sig2[j1]/sig2_new)*(w[j1]/w_new)*(1/(1-u2^2))
-  if (any(c(u1,u2,u3)>1))browser()
   
   # compute arguments to acceptance prob function 
   yj <- y[z %in% c(j1,j2)]
