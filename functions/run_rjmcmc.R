@@ -1,7 +1,8 @@
 # run MCMC
 
 run_mcmc <- function(y, k, w_init, z_init, mu_init, sig2_init,
-                     sweeps = 1000, burn = 1000){
+                     sweeps = 1000, burn = 1000,
+                     fixed_k = FALSE){
   
   # constants from data for priors
   M <- (max(y) + min(y))/2    # midpoint
@@ -47,6 +48,7 @@ run_mcmc <- function(y, k, w_init, z_init, mu_init, sig2_init,
                          g=configs$g,
                          h=configs$h_mult/R2)
     
+    if (!fixed_k){
     # step e
     ## choose whether to do split or combine step
     choose_split <- ((sample(0:1, 1)==1) & 
@@ -99,7 +101,7 @@ run_mcmc <- function(y, k, w_init, z_init, mu_init, sig2_init,
       w_curr <- birth_death$w
       mu_curr <- birth_death$mu
       sig2_curr <- birth_death$sig2
-    }
+    } }
     
     # store outputs
     if (i>burn){
@@ -110,7 +112,7 @@ run_mcmc <- function(y, k, w_init, z_init, mu_init, sig2_init,
       mu[[idx]] <- mu_curr
       sig2[[idx]] <- sig2_curr
     }
-  }
+  } 
   
   list(k=k, z=z, w=w, mu=mu, sig2=sig2,
        accept_split=accept_split, accept_combine=accept_combine,
