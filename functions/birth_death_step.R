@@ -1,6 +1,6 @@
 # move type f
 
-laccept_prob_birth <- function(w_new, k_sm, k0, n, delta){
+laccept_prob_birth <- function(w_new, k_sm, k0_sm, n, delta){
   
   prob_params <-
     (-lbeta(k_sm*delta, delta)) +
@@ -8,8 +8,8 @@ laccept_prob_birth <- function(w_new, k_sm, k0, n, delta){
     (n+k_sm*(delta-1))*log(1-w_new) +
     log(k_sm+1)
   
-  hastings_ratio <- 
-    -log(k0+1) -
+  hastings_ratio <-
+    -log(k0_sm+1) -
     dbeta(w_new,1,k_sm, log=T) +
     k_sm*log(w_new)
   
@@ -25,7 +25,7 @@ death_step <- function(k, z, w, mu, sig2, delta){
   j <- as.numeric(sample(as.character(is_empty), 1))
   laccept_prob <- 
     laccept_prob_birth(w[j], k-1, 
-                       k0=length(is_empty), n=length(z), delta=delta)
+                       k0=length(is_empty)-1, n=length(z), delta=delta)
   accept = (log(runif(1))<(-laccept_prob))
   
   out <- list(accept=accept)
