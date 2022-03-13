@@ -61,7 +61,7 @@ birth_step <- function(k, z, w, mu, sig2,
     out$k <- k + 1
     out$mu <- sort(c(mu, mu_new))
     
-    j_new <- which(mu_out==mu_new)
+    j_new <- which(out$mu==mu_new)
     out$sig2 <- append(sig2, sig2_new, after=j_new-1)
     out$w <- append(w*(1-w_new), w_new, after=j_new-1)
     out$z <- ifelse(z>=j_new, z+1, z)
