@@ -39,7 +39,7 @@ laccept_prob_split <- function(yj,
   p_sig2_given_k <-
     a*log(b) - lgamma(a) -
     (a+1)*log(prod(sig2_lg)/sig2_sm) -
-    b*(1/sum(1/sig2_lg)-sig2_sm)
+    b*(sum(1/sig2_lg)-(1/sig2_sm))
   
   part1_sum <- LR + p_wz_given_k + 
     p_mu_given_k + p_sig2_given_k
