@@ -81,7 +81,7 @@ combine_step <- function(y, k, z, w, mu, sig2,
   
   # compute arguments to acceptance prob function 
   yj <- y[z %in% c(j1,j2)]
-  z_lg <- z[z %in% c(j1,j2)] - j1 + 1
+  z_lg <- z[z %in% c(j1,j2)] - j1
   probs <- get_allocation_probs(yj,
                                 w[j1:j2],mu[j1:j2],sig2[j1:j2])
   lp_alloc <- sum(dbinom(z_lg, 1, probs[,2],log=T))
@@ -90,7 +90,7 @@ combine_step <- function(y, k, z, w, mu, sig2,
   laccept_prob <- laccept_prob_split(
     yj,  k_sm=k-1, 
     w_sm=w_new, mu_sm=mu_new, sig2_sm=sig2_new, 
-    z_lg=z_lg, 
+    z_lg=z_lg+1, 
     w_lg=w[j1:j2], mu_lg=mu[j1:j2], sig2_lg=sig2[j1:j2], 
     u=c(u1,u2,u3), lp_alloc=lp_alloc, 
     a=a, b=b, xi=xi, kappa=kappa, delta=delta)
