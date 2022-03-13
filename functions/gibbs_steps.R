@@ -35,7 +35,7 @@ update_mu <- function(y, k, z, mu, sig2,
   cond_mean <- (y_sum/sig2 + kappa*xi)*cond_var
   
   # propose and accept
-  mu_proposal <- rnorm(k, cond_mean, cond_var)
+  mu_proposal <- rnorm(k, cond_mean, sqrt(cond_var))
   
   ## accept if and only if order is right
   if (all(order(mu_proposal)==1:k)){
