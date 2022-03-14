@@ -21,8 +21,8 @@ laccept_prob_split <- function(yj,
   #       and most are RATIOS of lg/sm
   
   # part1: P(x')/P(x)
-  LR <- sum(dnorm(yj, mu_lg[z_lg], sig2_lg[z_lg], log=T)) - 
-    sum(dnorm(yj, mu_sm, sig2_sm, log=T))
+  LR <- sum(dnorm(yj, mu_lg[z_lg], sqrt(sig2_lg[z_lg]), log=T)) - 
+    sum(dnorm(yj, mu_sm, sqrt(sig2_sm), log=T))
   
   p_wz_given_k <- 
     (delta - 1 + nj[1])*log(w_lg[1]) +
