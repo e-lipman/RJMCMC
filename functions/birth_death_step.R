@@ -11,7 +11,7 @@ laccept_prob_birth <- function(w_new, k_sm, k0_sm, n, delta){
   hastings_ratio <-
     -log(k0_sm+1) -
     dbeta(w_new,1,k_sm, log=T) +
-    k_sm*log(w_new)
+    k_sm*log(1-w_new)
   
   prob_params + hastings_ratio
 }
