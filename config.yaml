@@ -1,3 +1,7 @@
+# data
+dat_name: "enzyme"
+save: FALSE
+
 # mcmc params
 sweeps: 100000
 burnin: 100000
