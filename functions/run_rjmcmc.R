@@ -60,7 +60,7 @@ run_mcmc <- function(y, k, w_init, z_init, mu_init, sig2_init,
                           xi=M, kappa=configs$kappa_mult/R2,
                           delta=configs$delta)
       accept_move_e <- split_comb$accept
-      accept_split <- c(accept_split, accept_move_e)
+      if (i>burn){accept_split <- c(accept_split, accept_move_e)}
     } else {
       split_comb <- combine_step(y, k_curr, z_curr, 
                            w_curr, mu_curr, sig2_curr, 
@@ -68,7 +68,7 @@ run_mcmc <- function(y, k, w_init, z_init, mu_init, sig2_init,
                            xi=M, kappa=configs$kappa_mult/R2,
                            delta=configs$delta)
       accept_move_e <- split_comb$accept
-      accept_combine <- c(accept_combine,accept_move_e)
+      if (i>burn){accept_combine <- c(accept_combine,accept_move_e)}
     }
     if (accept_move_e){
       k_curr <- split_comb$k
@@ -87,13 +87,13 @@ run_mcmc <- function(y, k, w_init, z_init, mu_init, sig2_init,
                                 xi=M, kappa=configs$kappa_mult/R2,
                                 delta=configs$delta)
       accept_move_f <- birth_death$accept
-      accept_birth <- c(accept_birth, accept_move_f)
+      if (i>burn){accept_birth <- c(accept_birth, accept_move_f)}
     } else {
       birth_death <- death_step(k_curr, z_curr, 
                                 w_curr, mu_curr, sig2_curr,
                                 delta=configs$delta)
       accept_move_f <- birth_death$accept 
-      accept_death <- c(accept_death, accept_move_f)
+      if (i>burn){accept_death <- c(accept_death, accept_move_f)}
     }
     if (accept_move_f){
       k_curr <- birth_death$k
