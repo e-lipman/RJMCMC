@@ -1,12 +1,18 @@
-# run MCMC
+# run RJMCMC
 
-run_mcmc <- function(y, k, w_init, z_init, mu_init, sig2_init,
-                     sweeps = 1000, burn = 1000,
-                     fixed_k = FALSE){
+run_rjmcmc <- function(y, k_init=3, fixed_k = FALSE,
+                     sweeps = 1000, burn = 1000){
   
   # constants from data for priors
   M <- (max(y) + min(y))/2    # midpoint
   R2 <- (max(y) - min(y))^2   # range
+  
+  # initial values
+  k_init <- k_init
+  w_init <- rep(1/k_init, k_init)
+  z_init <- ceiling(k_init*(1:length(y))/length(y))
+  mu_init <- quantile(y, seq(0,1,length=k_init))
+  sig2_init <- rep(max(y)-min(y), k_init)
   b_init <- rgamma(1, configs$g, configs$h_mult/R2)
   
   # outputs
