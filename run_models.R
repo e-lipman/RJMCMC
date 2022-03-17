@@ -30,7 +30,8 @@ hist(y, breaks=50)
 # run sampler
 tic()
 set.seed(71835)
-out <- run_rjmcmc(y, sweeps=1000, burn=1000)
+out <- run_rjmcmc(y, sweeps=configs$sweeps, burn=configs$burnin,
+                  progress = 1000)
 toc()
 
 # results
@@ -39,9 +40,10 @@ toc()
 prop.table(table(out$k))      # posterior for k
 plot(out$k, type="l")         # traceploft for k
 
+k_post <- tibble(k=names(table(out$k)),
+                 prob=table(out$k)) %>%
+  mutate(prob = prob/sum(prob))
 if (configs$save){
-  k_post <- tibble(k=names(table(out$k)),
-                   prob=table(out$k))
   saveRDS(k_post,
           file.path("results", paste0(dat_name, "_kpost.RDS")))
 }
@@ -53,19 +55,22 @@ cluster_plot
 if (configs$save){
   saveRDS(cluster_plot,
           file.path("results", paste0(dat_name, "_cluster.RDS")))
-  ggsave(width=3, height = fig_ratio,
+  ggsave(width = 5, 
+         height = 3, 
          file.path("figures", paste0(dat_name, "_cluster.jpeg")))
 }
 
 ## posterior predictive densities
-pp_plot <- plot_posterior_densities(y, out, k=1:6)
+top_n_k <- arrange(k_post, desc(prob)) %>%
+  pull(k) %>% .[1:configs$num_k_plot] %>% as.numeric()
+pp_plot <- plot_posterior_densities(y, out, k=top_n_k)
 pp_plot
 
 if (configs$save){
   saveRDS(pp_plot,
           file.path("results", paste0(dat_name, "_pp.RDS")))
-  ggsave(width=3, height = fig_ratio,
-       file.path("figures", paste0(dat_name, "_pp.jpeg")))
+  ggsave(width=5, height=2, 
+         file.path("figures", paste0(dat_name, "_pp.jpeg")))
 }
 
 ## posterior means
@@ -74,7 +79,8 @@ post_means_by_k <-
   mutate(post_means = map(k, post_means_fixed_k, out=out)) %>%
   unnest(post_means)
 
-k_mode <- names(table(out$k))[which.max(table(out$k))]
+k_mode <- arrange(k_post, desc(prob)) %>%
+  pull(k) %>% .[1]
 post_means_by_k %>% filter(k==k_mode)
 
 ## acceptance rates and empty components
@@ -88,6 +94,7 @@ if (configs$save){
   mix_stats <- tibble(accept_e = accept_stats$p[1], 
                       accept_f = accept_stats$p[2], 
                       num_empty = mean(out$k-z_count))
+  print(mix_stats)
   saveRDS(mix_stats,
           file.path("results", paste0(dat_name, "_stats.RDS")))
 }
