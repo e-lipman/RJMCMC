@@ -1,6 +1,6 @@
 # data
-dat_name: "enzyme"
-save: FALSE
+dat_name: "enzyme" # enzyme, acidity, galaxy
+save: TRUE
 
 # mcmc params
 sweeps: 100000
@@ -13,3 +13,6 @@ g: 0.2
 h_mult: 10 # multiple of 1/R^2 to use
 k_max: 30
 delta: 1
+
+# output configs
+num_k_plot: 3  # how many values of k to show in pp plot

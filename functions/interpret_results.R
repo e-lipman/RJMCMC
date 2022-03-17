@@ -18,6 +18,7 @@ make_cluster_plot <- function(out){
     ggplot(aes(x=i, y=j, fill=p)) +
     geom_tile() +
     scale_fill_gradient2() +
+    xlab("") + ylab("") +
     theme_bw()
 }
 
@@ -73,13 +74,13 @@ plot_posterior_densities <- function(y, out, k, combined=T,
                    alpha=.4,
                    inherit.aes=F) +
     geom_line(linetype=ifelse(combined, "dashed","solid")) +
-    xlab("y") + ylab("") +
+    xlab("") + ylab("") +
     theme_bw()
   
   if (combined){
     out <- out + 
       geom_line(data = dens_combined, 
-                color="black", linetype="solid")
+                color="black", linetype="solid", size=.25)
   }
   return(out)
 }
