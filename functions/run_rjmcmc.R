@@ -1,7 +1,8 @@
 # run RJMCMC
 
 run_rjmcmc <- function(y, k_init=3, fixed_k = FALSE,
-                     sweeps = 1000, burn = 1000){
+                     sweeps = 1000, burn = 1000,
+                     progress = NULL){
   
   # constants from data for priors
   M <- (max(y) + min(y))/2    # midpoint
@@ -36,6 +37,10 @@ run_rjmcmc <- function(y, k_init=3, fixed_k = FALSE,
   b_curr <- b_init
   
   for (i in 1:(burn+sweeps)){
+    if (!is.null(progress) & (i %% progress==0)){
+      print(paste0("Progress: ", i, " of ", sweeps+burn))
+    }
+    
     # step a
     w_curr <- update_weights(z_curr, k_curr, del=configs$delta)
     
